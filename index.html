@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>台東系列 | 自由規劃 & 地圖導航系統 4.3</title>
+    <title>台東系列 | 5.5 終極全能規劃系統</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -14,186 +14,137 @@
             --white: #ffffff;
             --tag-yellow: #ffd166;
             --tag-green: #06d6a0;
-            --tag-purple: #9b5de5;
+            --tag-red: #ef476f;
             --map-orange: #fb8500;
         }
 
         body { background-color: var(--bg-blue); color: #333; font-family: 'Noto Sans TC', sans-serif; margin: 0; padding: 20px; }
-        header { text-align: center; padding: 30px; background: linear-gradient(135deg, var(--primary-blue), var(--mid-blue)); color: white; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        header { 
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 40px; background: linear-gradient(135deg, var(--primary-blue), var(--mid-blue)); 
+            color: white; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        }
+
+        .add-item-btn {
+            background: var(--tag-yellow); color: #333; border: none; padding: 12px 24px;
+            border-radius: 30px; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+        .add-item-btn:hover { background: white; transform: scale(1.05); }
+
         .main-layout { display: flex; gap: 25px; align-items: flex-start; }
         
         .sidebar { width: 360px; background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); position: sticky; top: 20px; max-height: 85vh; overflow-y: auto; }
+        
         .itinerary-board { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; }
         .columns-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .day-column { background: rgba(255, 255, 255, 0.5); border: 2px dashed var(--mid-blue); border-radius: 15px; padding: 15px; min-height: 600px; }
-        .day-header { text-align: center; color: var(--primary-blue); font-size: 1.25rem; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid var(--light-sky); }
+        
+        .day-column { background: rgba(255, 255, 255, 0.7); border: 2px dashed var(--mid-blue); border-radius: 15px; padding: 15px; min-height: 500px; }
+        .day-header { text-align: center; color: var(--primary-blue); font-size: 1.25rem; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid var(--light-sky); padding-bottom: 10px; }
 
         .draggable-item { background: var(--white); border: 1px solid #eef2f3; padding: 15px; margin-bottom: 12px; border-radius: 12px; cursor: grab; box-shadow: 0 3px 6px rgba(0,0,0,0.03); }
-        .draggable-item:hover { border-color: var(--primary-blue); transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.08); }
         .item-title { font-weight: bold; color: var(--primary-blue); margin-bottom: 5px; font-size: 1rem; }
-        .item-addr { font-size: 0.75rem; color: #777; margin-bottom: 10px; line-height: 1.4; }
+        .item-addr { font-size: 0.75rem; color: #777; margin-bottom: 10px; display: block; }
 
-        .tag-group { display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; }
-        .tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; color: white; font-weight: bold; }
-        .tag-photo { background: var(--tag-purple); }
-        .tag-outdoor { background: var(--tag-green); }
-        .tag-culture { background: var(--map-orange); }
+        .tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; color: white; font-weight: bold; margin-right: 5px; }
+        .tag-food { background: var(--tag-red); }
+        .tag-photo { background: var(--primary-blue); }
         .tag-preset { background: var(--tag-yellow); color: #333; }
 
-        .map-btn { display: inline-block; font-size: 0.7rem; color: var(--map-orange); text-decoration: none; border: 1px solid var(--map-orange); padding: 2px 10px; border-radius: 20px; transition: 0.3s; }
-        .map-btn:hover { background: var(--map-orange); color: white; }
+        .map-link { 
+            display: inline-block; font-size: 0.75rem; color: var(--map-orange); 
+            text-decoration: none; border: 1px solid var(--map-orange); 
+            padding: 3px 12px; border-radius: 20px; font-weight: bold;
+        }
 
-        .hotel-section { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+        .hotel-section { background: white; padding: 25px; border-radius: 15px; margin-top: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
         th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
         th { background: var(--light-sky); color: var(--primary-blue); }
-        .price { color: #d90429; font-weight: bold; }
-        .drop-zone-active { background-color: var(--light-sky) !important; }
-
-        footer { text-align: center; margin: 40px 0; color: var(--mid-blue); font-size: 0.9rem; }
+        .price-text { color: var(--tag-red); font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>TAITUNG TRAVEL 4.3</h1>
-    <p>10大推薦景點補完！自由拖曳與地圖導航終極版</p>
+    <div><h1 style="margin:0">TAITUNG TRAVEL 5.5</h1><p style="margin:5px 0 0 0">全能旗艦版：住宿補齊、地圖連結、自定義景點系統</p></div>
+    <button class="add-item-btn" onclick="addNewItem()">➕ 新增自定義景點</button>
 </header>
 
 <div class="main-layout">
-    <div class="sidebar" ondrop="drop(event)" ondragover="allowDrop(event)">
-        <h3>✨ 推薦景點池 (全10處)</h3>
+    <div class="sidebar" id="sidebar" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <h3>✨ 推薦景點池</h3>
         <div id="pool">
-            <div class="draggable-item" draggable="true" id="s1">
-                <div class="tag-group"><span class="tag tag-photo">#金字塔</span><span class="tag tag-culture">#卑南</span></div>
-                <div class="item-title">臺東大學圖書館</div>
-                <div class="item-addr">臺東市大學路二段369號</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=臺東大學圖書館" target="_blank" class="map-btn">📍 開啟地圖</a>
+            <div class="draggable-item" draggable="true" id="s1"><div class="item-title">臺東大學圖書館</div><span class="item-addr">臺東市大學路二段369號</span><a href="https://www.google.com/maps/search/?api=1&query=臺東大學圖書館" target="_blank" class="map-link">📍 地圖</a></div>
+            <div class="draggable-item" draggable="true" id="s2"><div class="item-title">TTstyle 波浪屋</div><span class="item-addr">臺東市新生路105號</span><a href="https://www.google.com/maps/search/?api=1&query=TTstyle波浪屋" target="_blank" class="map-link">📍 地圖</a></div>
+            <div class="draggable-item" draggable="true" id="s3"><div class="item-title">星星部落</div><span class="item-addr">卑南鄉富源路116-3號</span><a href="https://www.google.com/maps/search/?api=1&query=星星部落" target="_blank" class="map-link">📍 地圖</a></div>
+            <div class="draggable-item" draggable="true" id="s10"><div class="item-title">加路蘭遊憩區</div><span class="item-addr">臺東市台11線</span><a href="https://www.google.com/maps/search/?api=1&query=加路蘭遊憩區" target="_blank" class="map-link">📍 地圖</a></div>
             </div>
-            <div class="draggable-item" draggable="true" id="s2">
-                <div class="tag-group"><span class="tag tag-photo">#波浪屋</span><span class="tag tag-culture">#市區</span></div>
-                <div class="item-title">TTstyle 波浪屋</div>
-                <div class="item-addr">臺東市新生路105號</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=TTstyle+波浪屋" target="_blank" class="map-btn">📍 開啟地圖</a>
-            </div>
-            <div class="draggable-item" draggable="true" id="s3">
-                <div class="tag-group"><span class="tag tag-photo">#夜景</span><span class="tag tag-culture">#卑南</span></div>
-                <div class="item-title">星星部落景觀咖啡</div>
-                <div class="item-addr">卑南鄉富源路116-3號</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=星星部落景觀咖啡" target="_blank" class="map-btn">📍 開啟地圖</a>
-            </div>
-            <div class="draggable-item" draggable="true" id="s4">
-                <div class="tag-group"><span class="tag tag-photo">#天空之鏡</span><span class="tag tag-outdoor">#太麻里</span></div>
-                <div class="item-title">華源天空之鏡</div>
-                <div class="item-addr">太麻里鄉華源村台9線</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=華源天空之鏡" target="_blank" class="map-btn">📍 開啟地圖</a>
-            </div>
-            <div class="draggable-item" draggable="true" id="s5">
-                <div class="tag-group"><span class="tag tag-photo">#海景</span><span class="tag tag-outdoor">#峇里島風</span></div>
-                <div class="item-title">可可娜咖啡</div>
-                <div class="item-addr">卑南鄉杉原22號</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=可可娜咖啡" target="_blank" class="map-btn">📍 開啟地圖</a>
-            </div>
-            <div class="draggable-item" draggable="true" id="s6">
-                <div class="tag-group"><span class="tag tag-outdoor">#單車</span><span class="tag tag-photo">#琵琶湖</span></div>
-                <div class="item-title">臺東森林公園</div>
-                <div class="item-addr">臺東市華泰路300號</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=臺東森林公園" target="_blank" class="map-btn">📍 開啟地圖</a>
-            </div>
-            <div class="draggable-item" draggable="true" id="s7">
-                <div class="tag-group"><span class="tag tag-photo">#灌籃高手</span><span class="tag tag-culture">#打卡</span></div>
-                <div class="item-title">櫻木花道平交道</div>
-                <div class="item-addr">太麻里鄉東63鄉道</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=櫻木花道平交道" target="_blank" class="map-btn">📍 開啟地圖</a>
-            </div>
-            <div class="draggable-item" draggable="true" id="s8">
-                <div class="tag-group"><span class="tag tag-outdoor">#秘境</span><span class="tag tag-photo">#消暑</span></div>
-                <div class="item-title">知本林道瀑布</div>
-                <div class="item-addr">卑南鄉知本林道</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=知本林道瀑布" target="_blank" class="map-btn">📍 開啟地圖</a>
-            </div>
-            <div class="draggable-item" draggable="true" id="s9">
-                <div class="tag-group"><span class="tag tag-photo">#文青</span><span class="tag tag-culture">#老屋</span></div>
-                <div class="item-title">山上有家麵包店</div>
-                <div class="item-addr">卑南鄉龍泉路146巷</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=山上有家麵包店" target="_blank" class="map-btn">📍 開啟地圖</a>
-            </div>
-            <div class="draggable-item" draggable="true" id="s10">
-                <div class="tag-group"><span class="tag tag-photo">#藝術</span><span class="tag tag-outdoor">#海邊</span></div>
-                <div class="item-title">加路蘭遊憩區</div>
-                <div class="item-addr">臺東市台11線157.7K</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=加路蘭遊憩區" target="_blank" class="map-btn">📍 開啟地圖</a>
-            </div>
-        </div>
     </div>
 
     <div class="itinerary-board">
         <div class="columns-container">
-            <div class="day-column" ondrop="drop(event)" ondragover="allowDrop(event)">
-                <div class="day-header">DAY 1</div>
-                <div class="draggable-item" draggable="true" id="o1" style="border-left: 5px solid var(--tag-yellow);">
-                    <div class="tag-group"><span class="tag tag-preset">#預設</span><span class="tag tag-outdoor">#牧場</span></div>
-                    <div class="item-title">初鹿牧場</div>
-                    <div class="item-addr">卑南鄉牧場1號</div>
-                    <a href="https://www.google.com/maps/search/?api=1&query=初鹿牧場" target="_blank" class="map-btn">📍 開啟地圖</a>
-                </div>
-                <div class="draggable-item" draggable="true" id="o4" style="border-left: 5px solid var(--tag-yellow);">
-                    <div class="tag-group"><span class="tag tag-preset">#預設</span><span class="tag tag-photo">#音樂</span></div>
-                    <div class="item-title">鐵花村音樂聚落</div>
-                    <div class="item-addr">臺東市新生路135巷26號</div>
-                    <a href="https://www.google.com/maps/search/?api=1&query=鐵花村音樂聚落" target="_blank" class="map-btn">📍 開啟地圖</a>
-                </div>
+            <div class="day-column" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="day-header">DAY 1</div>
+                <div class="draggable-item" draggable="true" id="f1"><span class="tag tag-food">#午餐</span><div class="item-title">華東牧場 (花蓮)</div><a href="https://www.google.com/maps/search/?api=1&query=花蓮華東牧場" target="_blank" class="map-link">📍 地圖</a></div>
+                <div class="draggable-item" draggable="true" id="o1" style="border-left: 5px solid var(--tag-yellow);"><div class="item-title">初鹿牧場 <span class="tag tag-preset">#預設</span></div><a href="https://www.google.com/maps/search/?api=1&query=初鹿牧場" target="_blank" class="map-link">📍 地圖</a></div>
+                <div class="draggable-item" draggable="true" id="f2"><span class="tag tag-food">#晚餐</span><div class="item-title">湛藍邊境</div><a href="https://www.google.com/maps/search/?api=1&query=湛藍邊境原住民主題餐廳" target="_blank" class="map-link">📍 地圖</a></div>
+                <div class="draggable-item" draggable="true" id="o4" style="border-left: 5px solid var(--tag-yellow);"><div class="item-title">鐵花村慢市集 <span class="tag tag-preset">#預設</span></div><a href="https://www.google.com/maps/search/?api=1&query=鐵花村音樂聚落" target="_blank" class="map-link">📍 地圖</a></div>
             </div>
-
-            <div class="day-column" ondrop="drop(event)" ondragover="allowDrop(event)">
-                <div class="day-header">DAY 2</div>
-                <div class="draggable-item" draggable="true" id="o2" style="border-left: 5px solid var(--tag-yellow);">
-                    <div class="tag-group"><span class="tag tag-preset">#預設</span><span class="tag tag-outdoor">#溯溪</span></div>
-                    <div class="item-title">桑樹溪溯溪</div>
-                    <div class="item-addr">卑南鄉桑樹溪 (達魯瑪克)</div>
-                    <a href="https://www.google.com/maps/search/?api=1&query=桑樹溪溯溪" target="_blank" class="map-btn">📍 開啟地圖</a>
-                </div>
+            <div class="day-column" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="day-header">DAY 2</div>
+                <div class="draggable-item" draggable="true" id="o2" style="border-left: 5px solid var(--tag-yellow);"><div class="item-title">桑樹溪溯溪 <span class="tag tag-preset">#預設</span></div><a href="https://www.google.com/maps/search/?api=1&query=桑樹溪" target="_blank" class="map-link">📍 地圖</a></div>
+                <div class="draggable-item" draggable="true" id="f3"><span class="tag tag-food">#晚餐</span><div class="item-title">蔬念 Vegine</div><a href="https://www.google.com/maps/search/?api=1&query=蔬念Vegine" target="_blank" class="map-link">📍 地圖</a></div>
             </div>
-
-            <div class="day-column" ondrop="drop(event)" ondragover="allowDrop(event)">
-                <div class="day-header">DAY 3</div>
-                <div class="draggable-item" draggable="true" id="o3" style="border-left: 5px solid var(--tag-yellow);">
-                    <div class="tag-group"><span class="tag tag-preset">#預設</span><span class="tag tag-culture">#部落</span></div>
-                    <div class="item-title">卡地布文化園區</div>
-                    <div class="item-addr">臺東市康定街116號</div>
-                    <a href="https://www.google.com/maps/search/?api=1&query=卡地布文化園區" target="_blank" class="map-btn">📍 開啟地圖</a>
-                </div>
+            <div class="day-column" ondrop="drop(event)" ondragover="allowDrop(event)"><div class="day-header">DAY 3</div>
+                <div class="draggable-item" draggable="true" id="o3" style="border-left: 5px solid var(--tag-yellow);"><div class="item-title">卡地布文化園區 <span class="tag tag-preset">#預設</span></div><a href="https://www.google.com/maps/search/?api=1&query=卡地布文化園區" target="_blank" class="map-link">📍 地圖</a></div>
+                <div class="draggable-item" draggable="true" id="f4"><span class="tag tag-food">#午餐</span><div class="item-title">原生應用植物園</div><a href="https://www.google.com/maps/search/?api=1&query=台東原生應用植物園" target="_blank" class="map-link">📍 地圖</a></div>
             </div>
         </div>
 
         <div class="hotel-section">
-            <h3>🏨 住宿資訊 & 地圖導引</h3>
+            <h3>🏨 住宿資訊完整清單</h3>
             <table>
-                <thead>
-                    <tr><th>飯店/民宿名稱</th><th>地址</th><th>房價參考 (二人/三人/四人)</th></tr>
-                </thead>
+                <thead><tr><th>飯店/民宿名稱</th><th>地址</th><th>價格參考 (二人 / 三人 / 四人)</th></tr></thead>
                 <tbody>
-                    <tr><td>富杉晴</td><td>卑南鄉富山村杉原70號</td><td class="price">2900 / -- / 4900 (六人 8900)</td></tr>
-                    <tr><td>伊塔原旅</td><td>台東市中山路10號</td><td class="price">1700 / 1800 / 2300</td></tr>
-                    <tr><td>丰綺會館</td><td>台東市和平街146號</td><td class="price">1680 / 2480 / 2800</td></tr>
-                    <tr><td>仲夏綠茵</td><td>台東市志航路一段146巷25號</td><td class="price">1980 / 2400 / 2480</td></tr>
-                    <tr><td>台糖池上牧野渡假村</td><td>池上鄉新興村110號</td><td class="price">2400 / 2900 / 3400</td></tr>
-                    <tr><td style="color:var(--primary-blue)">星級首選</td><td>娜路彎 / 桂田喜來登 / 知本金聯 / 日暉</td><td>現場報價</td></tr>
+                    <tr><td>富杉晴</td><td>卑南鄉富山村杉原70號</td><td class="price-text">2900 / -- / 4900 (六人 8900)</td></tr>
+                    <tr><td>伊塔原旅 (原住民會館)</td><td>台東市中山路10號</td><td class="price-text">1700 / 1800 / 2300</td></tr>
+                    <tr><td>丰綺會館</td><td>台東市和平街146號</td><td class="price-text">1680 / 2480 / 2800</td></tr>
+                    <tr><td>仲夏綠茵民宿</td><td>台東市志航路一段146巷25號</td><td class="price-text">1980 / 2400 / 2480</td></tr>
+                    <tr><td>台糖池上牧野渡假村</td><td>池上鄉新興村110號</td><td class="price-text">2400 / 2900 / 3400</td></tr>
+                    <tr><td style="color:var(--primary-blue); font-weight:bold;">星級系列 (娜路彎/桂田/金聯/日暉)</td><td>台東市/知本/池上</td><td class="price-text">現場報價</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<footer>Boni Travel System v4.3</footer>
-
 <script>
-    function allowDrop(ev) { ev.preventDefault(); let t = ev.target; while(t && !t.classList.contains('day-column') && !t.classList.contains('sidebar')) { t = t.parentElement; } if(t) t.classList.add('drop-zone-active'); }
-    document.addEventListener("dragleave", function(ev) { if(ev.target.classList.contains('day-column') || ev.target.classList.contains('sidebar')) { ev.target.classList.remove('drop-zone-active'); } }, false);
-    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
-    document.querySelectorAll('.draggable-item').forEach(i => i.addEventListener('dragstart', drag));
-    function drop(ev) { ev.preventDefault(); document.querySelectorAll('.day-column, .sidebar').forEach(el => el.classList.remove('drop-zone-active')); var data = ev.dataTransfer.getData("text"); var el = document.getElementById(data); let t = ev.target; while(t && !t.classList.contains('day-column') && !t.classList.contains('sidebar')) { t = t.parentElement; } if(t) t.appendChild(el); }
-</script>
+    let customId = 1000;
+    function addNewItem() {
+        const title = prompt("請輸入自定義景點或餐廳名稱：");
+        const addr = prompt("請輸入地址 (選填)：");
+        if (title) {
+            const pool = document.getElementById('pool');
+            const div = document.createElement('div');
+            div.className = 'draggable-item';
+            div.draggable = true;
+            div.id = 'custom_' + (customId++);
+            div.innerHTML = `<div class="item-title">${title}</div><span class="item-addr">${addr || '點擊地圖按鈕搜尋地址'}</span><a href="https://www.google.com/maps/search/?api=1&query=${title}" target="_blank" class="map-link">📍 地圖</a>`;
+            pool.appendChild(div);
+            div.addEventListener('dragstart', (ev) => ev.dataTransfer.setData("text", ev.target.id));
+        }
+    }
 
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        let target = ev.target;
+        while (target && !target.classList.contains('day-column') && target.id !== 'sidebar') {
+            target = target.parentElement;
+        }
+        if (target) target.appendChild(document.getElementById(data));
+    }
+    document.querySelectorAll('.draggable-item').forEach(i => i.addEventListener('dragstart', (ev) => ev.dataTransfer.setData("text", ev.target.id)));
+</script>
 </body>
 </html>
